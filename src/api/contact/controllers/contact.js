@@ -33,6 +33,7 @@ module.exports = createCoreController('api::contact.contact', ({strapi}) => {
 
                 const {user} = ctx.state;
                 ctx.request.body.data.author = user.id;
+                ctx.query = { ...ctx.query, populate: 'author' }
 
                 const response = await super.create(ctx);
                 return response;
