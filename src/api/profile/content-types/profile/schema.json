@@ -32,7 +32,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "profile"
+      "mappedBy": "profile"
     }
   }
 }
