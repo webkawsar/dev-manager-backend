@@ -29,17 +29,21 @@ module.exports = createCoreController('api::contact.contact', ({strapi}) => {
             }
         },
         async create(ctx) {
+
             try {
-
+                
                 const {user} = ctx.state;
-                ctx.request.body.data.author = user.id;
-                ctx.query = { ...ctx.query, populate: 'author' }
+                const files = ctx.request.files;
 
-                const response = await super.create(ctx);
+                const parsedData = JSON.parse(ctx?.request?.body?.data);
+                parsedData.author = user.id;
+
+                const response = await strapi.service('api::contact.contact').create({data:parsedData, files });
                 return response;
                 
             } catch (error) {
-                ctx.internalServerError('Unknown error');
+
+                ctx.internalServerError('Internal Server Error');
             }
         },
         async update(ctx) {
