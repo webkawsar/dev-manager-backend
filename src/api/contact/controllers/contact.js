@@ -38,7 +38,7 @@ module.exports = createCoreController('api::contact.contact', ({strapi}) => {
                 const parsedData = JSON.parse(ctx?.request?.body?.data);
                 parsedData.author = user.id;
 
-                const response = await strapi.service('api::contact.contact').create({data:parsedData, files });
+                const response = await strapi.service('api::contact.contact').create({data:parsedData, files, populate: '*' });
                 return response;
                 
             } catch (error) {
