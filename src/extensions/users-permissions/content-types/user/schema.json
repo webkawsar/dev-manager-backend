@@ -74,6 +74,12 @@
       "relation": "oneToOne",
       "target": "api::profile.profile",
       "inversedBy": "user"
+    },
+    "fullName": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 20
     }
   }
 }
