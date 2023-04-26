@@ -54,7 +54,7 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
         const contact = await strapi
           .service("api::contact.contact")
           .findOne(+id, {
-            populate: "author",
+            populate: ["author", "image"],
           });
 
         if (!contact) return ctx.notFound("Contact is not found to be update");
@@ -66,11 +66,7 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
 
         // at first remove old file
         if (Object.keys(ctx.request?.files).length) {
-          const imageId = JSON.parse(ctx.request.body.data).imageId;
-          const file = await strapi.plugins["upload"].services.upload.findOne(
-            imageId
-          );
-          await strapi.plugins["upload"].services.upload.remove(file);
+          await strapi.plugins["upload"].services.upload.remove(contact.image);
         }
 
         const response = await super.update(ctx);
