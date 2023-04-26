@@ -3,7 +3,9 @@
 /**
  * contact controller
  */
-
+let fetch = require("node-fetch");
+var FormData = require("form-data");
+var fs = require("fs");
 const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
@@ -20,8 +22,9 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
           });
 
         if (!contact) return ctx.notFound("Contact is not found to be deleted");
-        if (contact?.author?.id !== user?.id)
+        if (contact?.author?.id !== user?.id) {
           return ctx.unauthorized("You are not the owner of the contact");
+        }
 
         const response = await super.delete(ctx);
         return response;
@@ -46,8 +49,7 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
       try {
         const { id } = ctx.params;
         const { user } = ctx.state;
-        const files = ctx.request?.files;
-        const parsedData = JSON.parse(ctx?.request?.body?.data);
+        ctx.query = { ...ctx.query, populate: "*" };
 
         const contact = await strapi
           .service("api::contact.contact")
@@ -56,21 +58,22 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
           });
 
         if (!contact) return ctx.notFound("Contact is not found to be update");
-        if (contact?.author?.id !== user?.id)
+        if (contact?.author?.id !== user?.id) {
           return ctx.unauthorized(
             "You are not the owner of the contact to update"
           );
+        }
 
-        const response = await strapi.entityService.update(
-          "api::contact.contact",
-          id,
-          {
-            data: parsedData,
-            files,
-            populate: "*",
-          }
-        );
+        // at first remove old file
+        if (Object.keys(ctx.request?.files).length) {
+          const imageId = JSON.parse(ctx.request.body.data).imageId;
+          const file = await strapi.plugins["upload"].services.upload.findOne(
+            imageId
+          );
+          await strapi.plugins["upload"].services.upload.remove(file);
+        }
 
+        const response = await super.update(ctx);
         return response;
       } catch (error) {
         ctx.internalServerError("Internal Server Error");
