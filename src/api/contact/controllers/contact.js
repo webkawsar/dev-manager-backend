@@ -10,28 +10,6 @@ const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
   return {
-    async delete(ctx) {
-      try {
-        const { id } = ctx.params;
-        const { user } = ctx.state;
-
-        const contact = await strapi
-          .service("api::contact.contact")
-          .findOne(+id, {
-            populate: "author",
-          });
-
-        if (!contact) return ctx.notFound("Contact is not found to be deleted");
-        if (contact?.author?.id !== user?.id) {
-          return ctx.unauthorized("You are not the owner of the contact");
-        }
-
-        const response = await super.delete(ctx);
-        return response;
-      } catch (error) {
-        ctx.internalServerError("Internal server error");
-      }
-    },
     async create(ctx) {
       try {
         const { id } = ctx.state.user;
@@ -64,15 +42,40 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
           );
         }
 
-        // at first remove old file
+        // at first remove old file then update contact
         if (Object.keys(ctx.request?.files).length) {
-          await strapi.plugins["upload"].services.upload.remove(contact.image);
+          await strapi.plugins["upload"].services.upload.remove(contact?.image);
         }
 
         const response = await super.update(ctx);
         return response;
       } catch (error) {
         ctx.internalServerError("Internal Server Error");
+      }
+    },
+    async delete(ctx) {
+      try {
+        const { id } = ctx.params;
+        const { user } = ctx.state;
+
+        const contact = await strapi
+          .service("api::contact.contact")
+          .findOne(+id, {
+            populate: ["author", "image"],
+          });
+
+        if (!contact) return ctx.notFound("Contact is not found to be delete");
+        if (contact?.author?.id !== user?.id) {
+          return ctx.unauthorized("You are not the owner of the contact");
+        }
+
+        // at first delete contact image then contact data
+        await strapi.plugins["upload"].services.upload.remove(contact?.image);
+
+        const response = await super.delete(ctx);
+        return response;
+      } catch (error) {
+        ctx.internalServerError("Internal server error");
       }
     },
   };
