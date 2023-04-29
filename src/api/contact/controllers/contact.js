@@ -3,9 +3,7 @@
 /**
  * contact controller
  */
-let fetch = require("node-fetch");
-var FormData = require("form-data");
-var fs = require("fs");
+
 const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
@@ -70,7 +68,10 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
         }
 
         // at first delete contact image then contact data
-        await strapi.plugins["upload"].services.upload.remove(contact?.image);
+        if(contact?.image) {
+          
+          await strapi.plugins["upload"].services.upload.remove(contact?.image);
+        }
 
         const response = await super.delete(ctx);
         return response;
