@@ -10,30 +10,16 @@ module.exports = createCoreController("api::profile.profile", ({ strapi }) => {
   return {
     async create(ctx) {
       try {
-        const { user } = ctx.state;
-        const files = ctx.request.files;
-
-        const parsedData = JSON.parse(ctx?.request?.body?.data);
-        parsedData.user = user.id;
-
-        const response = await strapi
-          .service("api::profile.profile")
-          .create({ data: parsedData, files, populate: "*" });
-
-        // const userResponse = await strapi.query("plugin::users-permissions.user").update({
-        //   where: { id: user.id },
-        //   data: {
-        //     isProfile: true,
-        //   },
-        //   populate: true,
-        // });
-        // console.log(userResponse, 'userResponse');
-
+        const { id } = ctx.state.user;
+        ctx.query = { ...ctx.query, populate: "*" };
+        const data = JSON.parse(ctx.request?.body?.data);
+        data.user = id;
+        ctx.request.body = { ...ctx.request?.body, data: JSON.stringify(data) };
+        const response = await super.create(ctx);
         return response;
       } catch (error) {
-        console.log(error, "error");
         ctx.internalServerError("Internal Server Error");
       }
-    },
+    }
   };
 });
