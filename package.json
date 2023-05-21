@@ -11,11 +11,11 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@strapi/plugin-i18n": "4.3.6",
-    "@strapi/plugin-users-permissions": "4.3.6",
-    "@strapi/provider-email-sendgrid": "^4.5.1",
-    "@strapi/provider-upload-cloudinary": "^4.3.6",
-    "@strapi/strapi": "4.3.6",
+    "@strapi/plugin-i18n": "4.10.5",
+    "@strapi/plugin-users-permissions": "4.10.5",
+    "@strapi/provider-email-sendgrid": "4.10.5",
+    "@strapi/provider-upload-cloudinary": "4.10.5",
+    "@strapi/strapi": "4.10.5",
     "better-sqlite3": "^8.3.0",
     "pg": "^8.8.0",
     "pg-connection-string": "^2.5.0"
