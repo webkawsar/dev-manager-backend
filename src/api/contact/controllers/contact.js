@@ -16,6 +16,9 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
         data.author = id;
         ctx.request.body = { ...ctx.request?.body, data: JSON.stringify(data) };
         const response = await super.create(ctx);
+        console.log(ctx.request?.body, 'ctx.request?.body')
+        console.log(response, 'response')
+
         return response;
       } catch (error) {
         ctx.internalServerError("Internal Server Error");
