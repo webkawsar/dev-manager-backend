@@ -10,15 +10,19 @@ module.exports = createCoreController("api::contact.contact", ({ strapi }) => {
   return {
     async create(ctx) {
       try {
+
         const { id } = ctx.state.user;
         ctx.query = { ...ctx.query, populate: "*" };
         const data = JSON.parse(ctx.request?.body?.data);
         data.author = id;
         ctx.request.body = { ...ctx.request?.body, data: JSON.stringify(data) };
         const response = await super.create(ctx);
-        console.log(ctx.request?.body, 'ctx.request?.body')
-        console.log(response, 'response')
 
+        // const { id } = ctx.state.user;
+        // const files = ctx.request.files;                                              
+        // const parsedData = JSON.parse(ctx?.request?.body?.data);
+        // parsedData.author = id;
+        // const response = await strapi.service('api::contact.contact').create({ data: parsedData, files, populate: "*" });
         return response;
       } catch (error) {
         ctx.internalServerError("Internal Server Error");
